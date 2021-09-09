@@ -1,0 +1,26 @@
+#What does this script do?
+#=>Every time we push change to github we run this script: Travis is going to spin up
+#a Python server running Python 3.6. This server makes the docker service available
+#and use pip to install docker-compose and finally it is going to run our script.
+#if it exists a failure it will fail the build and send us a notification.
+
+#What language need travis to expect our project is written in
+language: python
+#specify the version of python
+version:
+  - "3.6"
+
+#What services we need to use?
+services:
+  - docker
+  #all the subservices we need are in our docker- and our docker-compose file
+
+#specify a before script: a script that docker runs before it executes any of the automation
+#commands that we are going to input next. Before it runs anything we need to install
+#docker-compose
+before_script: pip install docker-compose
+
+#next: specify our script
+#we run our docker-compose command for running test and include the linting tool flake8
+script:
+  - docker-compose run app sh -c "python manage.py test && flake8"
