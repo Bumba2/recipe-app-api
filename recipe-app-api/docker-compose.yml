@@ -1,0 +1,25 @@
+#docker-compose => tool that allows us to run our docker image easily from our docker
+#location. It allows us to manage the different services that make up our project.
+
+#version of docker-compose we are writing our file for:
+version: "3"
+
+#services that make up our application
+services:
+  #name of our service: We gonna have a service called app
+  app:
+    #and the build section of the configuration we gonna set a context
+    build:
+      #to . => which is our current directory.
+      context: .
+    #port configuration:
+    ports:
+      #we gonno map our project from port 8000 from our host to port 8000 from our image.
+      - "8000:8000"
+    #volume: a volume allows us to get the updates that we make in our project into our docker
+    #image in real time (we dont need to restart docker after making changes).
+    volumes:
+      - ./app:/app
+    #command: command that we use to run our app in our docker container
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

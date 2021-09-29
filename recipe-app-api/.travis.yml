@@ -15,12 +15,6 @@ services:
   - docker
   #all the subservices we need are in our docker- and our docker-compose file
 
-# echo prints the docker-password to the screen and | (pipe) sends it to the next command.addons:
-#docker login calls the docker login command by using the username we set in the .env
-#--password-stdin accepts the password without being printed to the screen
-before_install:
-  - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-
 #specify a before script: a script that docker runs before it executes any of the automation
 #commands that we are going to input next. Before it runs anything we need to install
 #docker-compose
@@ -30,4 +24,3 @@ before_script: pip install docker-compose
 #we run our docker-compose command for running test and include the linting tool flake8
 script:
   - docker-compose run app sh -c "python manage.py test && flake8"
-
