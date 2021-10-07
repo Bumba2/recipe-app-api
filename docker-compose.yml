@@ -21,5 +21,29 @@ services:
     volumes:
       - ./app:/app
     #command: command that we use to run our app in our docker container
+    #change it a bit adding wait for our db command: You call it using manage.py,
+    #and then you use "&&" and continue to execute any command you want to run next.
+    #we add the migrate command, which will run our database migrations on our
+    #database so it will create any tables that are required for our app.
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db #have to equal the name of the service that runs our database
+      - DB_NAME=app #have to equal our POSTGRES_DB
+      - DB_USER=postgres #have to equal our username POSTGRES_USER
+      - DB_PASS=supersecretpassword #our POSTGRES_PASSWORD
+    #We want our app service to depend on our db service:
+    #=>means the db service will start before the app service
+    #and the db service will be availbale via the network when you use the hostname db
+    depends_on:
+      - db
+
+
+  db: #name of the service that runs our database
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecretpassword

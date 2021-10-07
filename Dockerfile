@@ -12,8 +12,17 @@ ENV PYTHONUNBUFFERED 1
 
 #Store dependencies in a requirements.txt file. Copy it to the Docker image
 COPY ./requirements.txt /requirements.txt
+#install PostgreSQL Client: It uses the package manager which comes with alpine, and it says this is the name of the package manager "apk", we are gonna add a package, update the registry before we add it, dont store the registry the registry index on our docker file
+#We do this because best practice is to minimize the number of extra files and packages that are included in our docker container.
+RUN apk add --update --no-cache postgresql-client
+#add some temporary files (and delete them after we need them). "virtual" sets up an alias with name ".tmp-build-deps" => temporary build dependencies.
+# \ => newline. And then list all temporary dependencies that are required for installing our python dependencies.
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+        gcc libc-dev linux-headers postgresql-dev
 #Take the requirements.txt file that we copies before and install it using pip into the Docker image
 RUN python3 -m pip install -r /requirements.txt
+#delete the temporary requirements
+RUN apk del
 
 #Make a directory within our Docker image in which we store our application source code.
 #Make an empty Folder app, switch to it as the default location and copy it to the Docker image
